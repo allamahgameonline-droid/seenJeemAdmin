@@ -42,7 +42,8 @@ class _GamesPageState extends State<GamesPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const Icon(Icons.error_outline,
+                              size: 64, color: Colors.red),
                           const SizedBox(height: 16),
                           Text(
                             'Error: ${snapshot.error}',
@@ -58,7 +59,7 @@ class _GamesPageState extends State<GamesPage> {
                   }
 
                   final games = snapshot.data ?? [];
-                  
+
                   if (games.isEmpty) {
                     return const EmptyState(
                       icon: Icons.gamepad_outlined,
@@ -78,14 +79,21 @@ class _GamesPageState extends State<GamesPage> {
                   }).toList();
 
                   return CustomDataTable(
-                    columns: const ['User ID', 'Category', 'Score', 'Status', 'Created At'],
+                    columns: const [
+                      'User ID',
+                      'Category',
+                      'Score',
+                      'Status',
+                      'Created At'
+                    ],
                     rows: rows,
                     onDelete: (index) async {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('Delete Game'),
-                          content: const Text('Are you sure you want to delete this game?'),
+                          content: const Text(
+                              'Are you sure you want to delete this game?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -93,7 +101,8 @@ class _GamesPageState extends State<GamesPage> {
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                              child: const Text('Delete',
+                                  style: TextStyle(color: Colors.red)),
                             ),
                           ],
                         ),

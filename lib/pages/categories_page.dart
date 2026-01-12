@@ -95,7 +95,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 if (_editingCategory == null) {
                   await _firestoreService.addCategory(categoryModel);
                 } else {
-                  await _firestoreService.updateCategory(_editingCategory!.id, categoryModel);
+                  await _firestoreService.updateCategory(
+                      _editingCategory!.id, categoryModel);
                 }
 
                 if (mounted) {
@@ -146,7 +147,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const Icon(Icons.error_outline,
+                              size: 64, color: Colors.red),
                           const SizedBox(height: 16),
                           Text(
                             'Error: ${snapshot.error}',
@@ -162,7 +164,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   }
 
                   final categories = snapshot.data ?? [];
-                  
+
                   if (categories.isEmpty) {
                     return EmptyState(
                       icon: Icons.category_outlined,
@@ -186,7 +188,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   }).toList();
 
                   return CustomDataTable(
-                    columns: const ['Name', 'Description', 'Status', 'Created At'],
+                    columns: const [
+                      'Name',
+                      'Description',
+                      'Status',
+                      'Created At'
+                    ],
                     rows: rows,
                     onEdit: (index) => _showCategoryDialog(categories[index]),
                     onDelete: (index) async {
@@ -194,7 +201,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('Delete Category'),
-                          content: const Text('Are you sure you want to delete this category?'),
+                          content: const Text(
+                              'Are you sure you want to delete this category?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -202,14 +210,16 @@ class _CategoriesPageState extends State<CategoriesPage> {
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                              child: const Text('Delete',
+                                  style: TextStyle(color: Colors.red)),
                             ),
                           ],
                         ),
                       );
 
                       if (confirm == true) {
-                        await _firestoreService.deleteCategory(categories[index].id);
+                        await _firestoreService
+                            .deleteCategory(categories[index].id);
                       }
                     },
                   );
