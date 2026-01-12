@@ -10,13 +10,13 @@ void main() async {
   try {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: 'YOUR_API_KEY',
-        authDomain: 'allmahgame.firebaseapp.com',
-        projectId: 'allmahgame',
-        storageBucket: 'allmahgame.appspot.com',
-        messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-        appId: 'YOUR_APP_ID',
-      ),
+          apiKey: "AIzaSyDCxMT_ouWkmcSNw015ANi-MwvsDryHqlE",
+          authDomain: "allmahgame.firebaseapp.com",
+          projectId: "allmahgame",
+          storageBucket: "allmahgame.firebasestorage.app",
+          messagingSenderId: "564436165702",
+          appId: "1:564436165702:web:e5835d1939d8122cab9647",
+          measurementId: "G-STJQ93CRJL"),
     );
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
