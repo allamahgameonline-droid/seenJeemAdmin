@@ -30,7 +30,8 @@ class ExcelService {
             final option2 = row[3]?.value?.toString() ?? '';
             final option3 = row[4]?.value?.toString() ?? '';
             final option4 = row[5]?.value?.toString() ?? '';
-            final correctAnswer = int.tryParse(row[6]?.value?.toString() ?? '0') ?? 0;
+            final correctAnswer =
+                int.tryParse(row[6]?.value?.toString() ?? '0') ?? 0;
             final difficulty = row[7]?.value?.toString() ?? 'medium';
 
             questions.add(QuestionModel(
@@ -59,14 +60,14 @@ class ExcelService {
     Sheet sheetObject = excel['Questions'];
 
     sheetObject.appendRow([
-      const TextCellValue('Category ID'),
-      const TextCellValue('Question'),
-      const TextCellValue('Option 1'),
-      const TextCellValue('Option 2'),
-      const TextCellValue('Option 3'),
-      const TextCellValue('Option 4'),
-      const TextCellValue('Correct Answer'),
-      const TextCellValue('Difficulty'),
+      TextCellValue('Category ID'),
+      TextCellValue('Question'),
+      TextCellValue('Option 1'),
+      TextCellValue('Option 2'),
+      TextCellValue('Option 3'),
+      TextCellValue('Option 4'),
+      TextCellValue('Correct Answer'),
+      TextCellValue('Difficulty'),
     ]);
 
     for (var question in questions) {

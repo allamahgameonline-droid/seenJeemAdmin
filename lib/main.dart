@@ -7,16 +7,21 @@ import 'pages/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: 'YOUR_API_KEY',
-      authDomain: 'allmahgame.firebaseapp.com',
-      projectId: 'allmahgame',
-      storageBucket: 'allmahgame.appspot.com',
-      messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-      appId: 'YOUR_APP_ID',
-    ),
-  );
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'YOUR_API_KEY',
+        authDomain: 'allmahgame.firebaseapp.com',
+        projectId: 'allmahgame',
+        storageBucket: 'allmahgame.appspot.com',
+        messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+        appId: 'YOUR_APP_ID',
+      ),
+    );
+  } catch (e) {
+    debugPrint('Firebase initialization error: $e');
+    // Continue anyway - Firebase might work with web SDK
+  }
   runApp(const MyApp());
 }
 
