@@ -16,10 +16,19 @@ class PaymentModel {
   });
 
   factory PaymentModel.fromFirestore(Map<String, dynamic> data, String id) {
+    double amountValue = 0.0;
+    if (data['amount'] != null) {
+      if (data['amount'] is double) {
+        amountValue = data['amount'];
+      } else if (data['amount'] is num) {
+        amountValue = data['amount'].toDouble();
+      }
+    }
+    
     return PaymentModel(
       id: id,
       userId: data['userId'] ?? '',
-      amount: (data['amount'] ?? 0).toDouble(),
+      amount: amountValue,
       status: data['status'] ?? 'pending',
       type: data['type'] ?? 'withdrawal',
       createdAt: data['createdAt'] != null

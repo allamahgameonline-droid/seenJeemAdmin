@@ -4,6 +4,7 @@ import '../services/firestore_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_data_table.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/empty_state.dart';
 import 'package:intl/intl.dart';
 
 class UsersPage extends StatefulWidget {
@@ -159,21 +160,47 @@ class _UsersPageState extends State<UsersPage> {
                 stream: _firestoreService.getUsers(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final users = snapshot.data!;
+                  final users = snapshot.data ?? [];
+                  
+                  if (users.isEmpty) {
+                    return EmptyState(
+                      icon: Icons.people_outline,
+                      title: 'No Users',
+                      message: 'Get started by adding your first user.',
+                      action: CustomButton(
+                        text: 'Add User',
+                        icon: Icons.add,
+                        onPressed: () => _showUserDialog(),
+                      ),
+                    );
+                  }
+
                   final rows = users.map((user) {
                     return [
                       user.name,
                       user.email,
                       user.role,
                       user.gamesPlayed.toString(),
-                      '\$${user.totalWinnings}',
+                      '\$${user.totalWinnings.toStringAsFixed(2)}',
                       user.isActive ? 'Active' : 'Inactive',
                       DateFormat('MMM dd, yyyy').format(user.createdAt),
                     ];

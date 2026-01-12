@@ -29,8 +29,16 @@ class UserModel {
       createdAt: data['createdAt'] != null
           ? DateTime.parse(data['createdAt'])
           : DateTime.now(),
-      gamesPlayed: data['gamesPlayed'] ?? 0,
-      totalWinnings: data['totalWinnings'] ?? 0,
+      gamesPlayed: (data['gamesPlayed'] is int)
+          ? data['gamesPlayed']
+          : (data['gamesPlayed'] is num)
+              ? data['gamesPlayed'].toInt()
+              : 0,
+      totalWinnings: (data['totalWinnings'] is int)
+          ? data['totalWinnings']
+          : (data['totalWinnings'] is num)
+              ? data['totalWinnings'].toInt()
+              : 0,
     );
   }
 

@@ -9,8 +9,9 @@ class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Stream<List<UserModel>> getUsers() {
-    return _db.collection('users').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => UserModel.fromFirestore(doc.data(), doc.id)).toList());
+    return _db.collection('users').snapshots().map((snapshot) => snapshot.docs
+        .map((doc) => UserModel.fromFirestore(doc.data(), doc.id))
+        .toList());
   }
 
   Future<void> addUser(UserModel user) async {
@@ -26,8 +27,10 @@ class FirestoreService {
   }
 
   Stream<List<CategoryModel>> getCategories() {
-    return _db.collection('categories').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => CategoryModel.fromFirestore(doc.data(), doc.id)).toList());
+    return _db.collection('categories').snapshots().map((snapshot) => snapshot
+        .docs
+        .map((doc) => CategoryModel.fromFirestore(doc.data(), doc.id))
+        .toList());
   }
 
   Future<void> addCategory(CategoryModel category) async {
@@ -43,8 +46,10 @@ class FirestoreService {
   }
 
   Stream<List<QuestionModel>> getQuestions() {
-    return _db.collection('questions').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => QuestionModel.fromFirestore(doc.data(), doc.id)).toList());
+    return _db.collection('questions').snapshots().map((snapshot) => snapshot
+        .docs
+        .map((doc) => QuestionModel.fromFirestore(doc.data(), doc.id))
+        .toList());
   }
 
   Future<void> addQuestion(QuestionModel question) async {
@@ -60,8 +65,9 @@ class FirestoreService {
   }
 
   Stream<List<GameModel>> getGames() {
-    return _db.collection('games').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => GameModel.fromFirestore(doc.data(), doc.id)).toList());
+    return _db.collection('games').snapshots().map((snapshot) => snapshot.docs
+        .map((doc) => GameModel.fromFirestore(doc.data(), doc.id))
+        .toList());
   }
 
   Future<void> addGame(GameModel game) async {
@@ -77,8 +83,10 @@ class FirestoreService {
   }
 
   Stream<List<PaymentModel>> getPayments() {
-    return _db.collection('payments').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => PaymentModel.fromFirestore(doc.data(), doc.id)).toList());
+    return _db.collection('payments').snapshots().map((snapshot) => snapshot
+        .docs
+        .map((doc) => PaymentModel.fromFirestore(doc.data(), doc.id))
+        .toList());
   }
 
   Future<void> addPayment(PaymentModel payment) async {
@@ -94,24 +102,47 @@ class FirestoreService {
   }
 
   Future<Map<String, dynamic>> getDashboardStats() async {
-    final usersSnapshot = await _db.collection('users').get();
-    final gamesSnapshot = await _db.collection('games').get();
-    final questionsSnapshot = await _db.collection('questions').get();
-    final paymentsSnapshot = await _db.collection('payments').get();
+    try {
+      // Use timeout for each query to prevent hanging
+      final futures = await Future.wait([
+        _db.collection('users').get().timeout(const Duration(seconds: 5)),
+        _db.collection('games').get().timeout(const Duration(seconds: 5)),
+        _db.collection('questions').get().timeout(const Duration(seconds: 5)),
+        _db.collection('payments').get().timeout(const Duration(seconds: 5)),
+      ]);
 
-    double totalRevenue = 0;
-    for (var doc in paymentsSnapshot.docs) {
-      final payment = PaymentModel.fromFirestore(doc.data(), doc.id);
-      if (payment.status == 'completed') {
-        totalRevenue += payment.amount;
+      final usersSnapshot = futures[0];
+      final gamesSnapshot = futures[1];
+      final questionsSnapshot = futures[2];
+      final paymentsSnapshot = futures[3];
+
+      double totalRevenue = 0.0;
+      for (var doc in paymentsSnapshot.docs) {
+        try {
+          final payment = PaymentModel.fromFirestore(doc.data(), doc.id);
+          if (payment.status == 'completed') {
+            totalRevenue += payment.amount;
+          }
+        } catch (e) {
+          // Skip invalid payment documents
+          continue;
+        }
       }
-    }
 
-    return {
-      'totalUsers': usersSnapshot.docs.length,
-      'totalGames': gamesSnapshot.docs.length,
-      'totalQuestions': questionsSnapshot.docs.length,
-      'totalRevenue': totalRevenue,
-    };
+      return {
+        'totalUsers': usersSnapshot.docs.length,
+        'totalGames': gamesSnapshot.docs.length,
+        'totalQuestions': questionsSnapshot.docs.length,
+        'totalRevenue': totalRevenue,
+      };
+    } catch (e) {
+      // Return zero values if there's an error
+      return {
+        'totalUsers': 0,
+        'totalGames': 0,
+        'totalQuestions': 0,
+        'totalRevenue': 0.0,
+      };
+    }
   }
 }

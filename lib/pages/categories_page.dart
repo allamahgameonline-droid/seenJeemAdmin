@@ -4,6 +4,7 @@ import '../services/firestore_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_data_table.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/empty_state.dart';
 import 'package:intl/intl.dart';
 
 class CategoriesPage extends StatefulWidget {
@@ -141,14 +142,40 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 stream: _firestoreService.getCategories(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final categories = snapshot.data!;
+                  final categories = snapshot.data ?? [];
+                  
+                  if (categories.isEmpty) {
+                    return EmptyState(
+                      icon: Icons.category_outlined,
+                      title: 'No Categories',
+                      message: 'Get started by adding your first category.',
+                      action: CustomButton(
+                        text: 'Add Category',
+                        icon: Icons.add,
+                        onPressed: () => _showCategoryDialog(),
+                      ),
+                    );
+                  }
+
                   final rows = categories.map((category) {
                     return [
                       category.name,

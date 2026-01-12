@@ -5,6 +5,7 @@ import '../services/excel_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_data_table.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/empty_state.dart';
 
 class QuestionsPage extends StatefulWidget {
   const QuestionsPage({super.key});
@@ -272,14 +273,52 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 stream: _firestoreService.getQuestions(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final questions = snapshot.data!;
+                  final questions = snapshot.data ?? [];
+                  
+                  if (questions.isEmpty) {
+                    return EmptyState(
+                      icon: Icons.help_outline,
+                      title: 'No Questions',
+                      message: 'Get started by adding your first question or importing from Excel.',
+                      action: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomButton(
+                            text: 'Import Excel',
+                            icon: Icons.upload_file,
+                            onPressed: _importExcel,
+                            color: Colors.green,
+                          ),
+                          const SizedBox(width: 12),
+                          CustomButton(
+                            text: 'Add Question',
+                            icon: Icons.add,
+                            onPressed: () => _showQuestionDialog(),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   final rows = questions.map((question) {
                     return [
                       question.question.length > 50

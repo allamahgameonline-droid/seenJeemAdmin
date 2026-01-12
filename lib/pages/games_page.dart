@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/game_model.dart';
 import '../services/firestore_service.dart';
 import '../widgets/custom_data_table.dart';
+import '../widgets/empty_state.dart';
 import 'package:intl/intl.dart';
 
 class GamesPage extends StatefulWidget {
@@ -37,14 +38,35 @@ class _GamesPageState extends State<GamesPage> {
                 stream: _firestoreService.getGames(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final games = snapshot.data!;
+                  final games = snapshot.data ?? [];
+                  
+                  if (games.isEmpty) {
+                    return const EmptyState(
+                      icon: Icons.gamepad_outlined,
+                      title: 'No Games',
+                      message: 'No games have been played yet.',
+                    );
+                  }
+
                   final rows = games.map((game) {
                     return [
                       game.userId,

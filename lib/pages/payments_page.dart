@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/payment_model.dart';
 import '../services/firestore_service.dart';
 import '../widgets/custom_data_table.dart';
+import '../widgets/empty_state.dart';
 import 'package:intl/intl.dart';
 
 class PaymentsPage extends StatefulWidget {
@@ -37,14 +38,35 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 stream: _firestoreService.getPayments(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final payments = snapshot.data!;
+                  final payments = snapshot.data ?? [];
+                  
+                  if (payments.isEmpty) {
+                    return const EmptyState(
+                      icon: Icons.payment_outlined,
+                      title: 'No Payments',
+                      message: 'No payments have been recorded yet.',
+                    );
+                  }
+
                   final rows = payments.map((payment) {
                     return [
                       payment.userId,

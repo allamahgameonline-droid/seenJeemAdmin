@@ -24,8 +24,16 @@ class GameModel {
       id: id,
       userId: data['userId'] ?? '',
       categoryId: data['categoryId'] ?? '',
-      score: data['score'] ?? 0,
-      totalQuestions: data['totalQuestions'] ?? 0,
+      score: (data['score'] is int) 
+          ? data['score'] 
+          : (data['score'] is num) 
+              ? data['score'].toInt() 
+              : 0,
+      totalQuestions: (data['totalQuestions'] is int) 
+          ? data['totalQuestions'] 
+          : (data['totalQuestions'] is num) 
+              ? data['totalQuestions'].toInt() 
+              : 0,
       status: data['status'] ?? 'pending',
       createdAt: data['createdAt'] != null
           ? DateTime.parse(data['createdAt'])
